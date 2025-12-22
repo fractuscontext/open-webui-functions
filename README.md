@@ -1,77 +1,36 @@
-# ⚡ Time-Aware Context Clipper
+# ⏻ Open WebUI Inlet Functions  
+  
+Claire's best Open WebUI Functions  
+  
+## Functions
 
-Perplexity-style filter function for OpenWebUI that combines context clipping + time injection in one pass. **Faster than running two separate filters.**
-
-**Author:** [@fractuscontext](https://github.com/fractuscontext) • **Tested on** OpenWebUI v0.6.40 • MIT License
-
-## What It Does
-
-1. **Clips conversations** to last N messages (default: 5)
-2. **Adds timestamps** to historical messages (converted to your timezone)
-3. **Injects current time** from browser into the latest message
-4. **Teaches the LLM** how to interpret the time metadata via auto-injected system prompt
+<!-- markdownlint-disable MD033 -->
+| Function | Features |  
+| -- | -- |
+| [token-saver-reloaded][tsr-doc] | - Only sends the last N messages to the provider to save LLM costs and time <br><br> - Injects real timestamps to current and historical messages so the AI knows exactly what time it is <br><br> - Did it trim too much? Re-discover forgotten messages via Semantic (PyTorch) or BM25 search <br><br> - Strips image attachments from older messages to save multimodal token bandwidth <br><br> - Regex that removes filler words and corporate jargon from user prompts without breaking code blocks<br> |  
+| [concise-output][co-doc] | - Injects system-level instructions that push the LLM toward concise, structured output <br><br> - Sets a soft target word count and enforces clean bullet points <br><br> - Suppresses preambles (e.g., "As an AI") and filler phrases |
+<!-- markdownlint-enable MD033 -->
 
 ## Installation
 
-**Requirements**: `httpx` (pre-installed in Docker; run `pip install httpx` for bare metal).
+**Requirements**: Open WebUI v0.8.4 or higher.
 
-## Configuration (Valves)
+1. Navigate to **Admin Panel** → **Functions** → **Import From Link**.  
+  
+2. Paste the preferred raw URL:  
+  
+   - **Token Saver**: [`token-saver-reloaded.py`][tsr-raw]
+   - **Concise Output**: [`concise-output.py`][co-raw]
+  
+3. Enable the filter.  
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `n_last_messages` | `5` | How many messages to keep |
-| `api_base_url` | `http://127.0.0.1:8080` | Your Open WebUI URL |
-| `enable_api_fallback` | `True` | Fetch chat history for timestamps |
-| `inject_system_instructions` | `True` | Add temporal awareness instructions |
+## License
 
-### Setup Notes
+MIT License © 2026 fractuscontext
 
-- **Docker users:** Change `api_base_url` to `http://host.docker.internal:8080` or `https://openwebui.yourdomain.org`
-- **Timezone:** Extracted from browser JS settings, not GPS location.
+<!-- URL Definitions -->
 
-## Why It's Fast
-
-| Features | Benefit |
-|--------------|---------|
-| **Single API call** | Fetches history once, not twice |
-| **No BeautifulSoup** | No HTML parsing overhead |
-| **Async-first** | Non-blocking I/O with `httpx` |
-| **Processes only N messages** | Skips the entire chat history, only touches what matters |
-
-**Result:** One fetch, one loop, minimal processing. Other filters parse XML, iterate full history, or run sequentially.
-
-## What the LLM Sees
-
-**What the System Prompt Looks Like:**
-```
-You are a helpful assistant blablblablabla. ← Your original system prompt
-
-## TEMPORAL AWARENESS & CONTEXT ← This section is automatically appended by the filter
-You are running with a "Time-Aware" filter. Use the metadata as your source of truth:
-1. **Current Time**: The definitive "Now" is in the `**System Context:**` block at the end of the latest user message.
-2. **Conversation History**: Previous messages have `[History: ...]` timestamp prefixes.
-
-*Note: Time is extracted from the user's browser. It reflects their OS timezone settings, not GPS location.*
-```
-
-**User's Message (historical):**
-```
-[History: 2025-12-15 14:30:45 ACDT]
-What's the weather like?
-```
-
-**User's Message (current):**
-```
-Hi :3333333
-
----
-**System Context:**
-Current Date/Time: Mon Dec 15 2025, 20:52:17
-Timezone: Australia/Adelaide
-Weekday: Monday
----
-```
-
-**⭐ If this saved you time, star the repo!**
-
-Made with ☕ by [@fractuscontext](https://github.com/fractuscontext)
+[tsr-doc]: token-saver-reloaded/token-saver-reloaded.md
+[co-doc]: concise-output/concise-output.md
+[tsr-raw]: https://raw.githubusercontent.com/fractuscontext/open-webui-functions/main/token-saver-reloaded/token-saver-reloaded.py
+[co-raw]: https://raw.githubusercontent.com/fractuscontext/open-webui-functions/main/concise-output/concise-output.py
